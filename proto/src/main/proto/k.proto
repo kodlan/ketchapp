@@ -6,12 +6,18 @@ option java_package = "k.ketchapp.proto";
 package kapp;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service Pomodoro {
   rpc recordEvent(Event) returns (google.protobuf.Empty);
+  rpc getEvents(google.protobuf.Empty) returns (GetEventsResponse);
 }
 
 message Event {
-  string startDate = 1;
-  string endDate = 2;
+  google.protobuf.Timestamp startDate = 1;
+  google.protobuf.Timestamp endDate = 2;
+}
+
+message GetEventsResponse {
+  repeated Event event = 1;
 }
