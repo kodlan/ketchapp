@@ -15,6 +15,7 @@ public class PomodoroImpl extends PomodoroGrpc.PomodoroImplBase {
   @Override
   public void recordEvent(Event request, StreamObserver<Empty> responseObserver) {
     events.add(request);
+    responseObserver.onNext(Empty.newBuilder().build());
     responseObserver.onCompleted();
   }
 
