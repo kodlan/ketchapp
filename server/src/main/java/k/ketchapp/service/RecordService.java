@@ -6,15 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 import k.ketchapp.proto.Event;
 import k.ketchapp.proto.GetEventsResponse;
-import k.ketchapp.proto.PomodoroGrpc;
+import k.ketchapp.proto.RecordServiceGrpc;
+import k.ketchapp.proto.StoreEventRequest;
 
-public class PomodoroImpl extends PomodoroGrpc.PomodoroImplBase {
+public class RecordService extends RecordServiceGrpc.RecordServiceImplBase {
 
   List<Event> events = new ArrayList<>();
 
   @Override
-  public void recordEvent(Event request, StreamObserver<Empty> responseObserver) {
-    events.add(request);
+  public void storeEvent(StoreEventRequest request, StreamObserver<Empty> responseObserver) {
+    events.add(request.getEvent());
     responseObserver.onNext(Empty.newBuilder().build());
     responseObserver.onCompleted();
   }

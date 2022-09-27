@@ -7,11 +7,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import k.ketchapp.functional.ThrowingRunnable;
-import k.ketchapp.service.PomodoroImpl;
+import k.ketchapp.service.RecordService;
 
-public class PomodoroServer {
+public class RecordServer {
 
-  private static final Logger logger = Logger.getLogger(PomodoroServer.class.getName());
+  private static final Logger logger = Logger.getLogger(RecordServer.class.getName());
 
   private Server server;
 
@@ -20,14 +20,14 @@ public class PomodoroServer {
 
     server = ServerBuilder
         .forPort(port)
-        .addService(new PomodoroImpl())
+        .addService(new RecordService())
         .build()
         .start();
 
     Runtime.getRuntime().addShutdownHook(
         new Thread(
             ThrowingRunnable.handleThrowingRunnable(
-                PomodoroServer.this::stopServer,
+                RecordServer.this::stopServer,
                 exception -> logger.log(Level.SEVERE, "Server shutdown error", exception))));
 
     logger.log(Level.INFO, "Server started at port " + port);
@@ -47,9 +47,9 @@ public class PomodoroServer {
   }
 
   public static void main(String[] args) throws InterruptedException, IOException {
-    PomodoroServer pomodoroServer = new PomodoroServer();
+    RecordServer recordServer = new RecordServer();
 
-    pomodoroServer.startServer();
-    pomodoroServer.blockUntilShutdown();
+    recordServer.startServer();
+    recordServer.blockUntilShutdown();
   }
 }

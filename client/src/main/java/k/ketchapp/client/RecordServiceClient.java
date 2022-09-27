@@ -10,14 +10,15 @@ import java.time.ZoneOffset;
 import java.util.Random;
 import k.ketchapp.proto.Event;
 import k.ketchapp.proto.GetEventsResponse;
-import k.ketchapp.proto.PomodoroGrpc;
-import k.ketchapp.proto.PomodoroGrpc.PomodoroBlockingStub;
+import k.ketchapp.proto.RecordServiceGrpc;
+import k.ketchapp.proto.RecordServiceGrpc.RecordServiceBlockingStub;
+import k.ketchapp.proto.StoreEventRequest;
 
-public class PomodoroClient {
+public class RecordServiceClient {
 
   private static final Random rnd = new Random();
 
-  private static Event generateRandomEvent() {
+  private static StoreEventRequest generateRandomEvent() {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime start = now.minusHours(rnd.nextInt() % 10);
     LocalDateTime end = start.plusMinutes(10 + rnd.nextInt() % 49);
@@ -35,19 +36,24 @@ public class PomodoroClient {
         .setNanos(endInstant.getNano())
         .build();
 
-    return Event.newBuilder()
+    Event event =  Event.newBuilder()
         .setStartDate(startTimestamp)
         .setEndDate(endTimestamp)
         .build();
+
+    return StoreEventRequest.newBuilder()
+        .setEvent(event)
+        .build();
   }
 
-  private static void recordEvents(PomodoroBlockingStub pomodoroStub) {
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  private static void recordEvents(RecordServiceBlockingStub recordServiceStub) {
     for (int i = 0; i < 20; i ++) {
-      pomodoroStub.recordEvent(generateRandomEvent());
+      recordServiceStub.storeEvent(generateRandomEvent());
     }
   }
 
-  private static void getAllRecordedEvents(PomodoroBlockingStub pomodoroStub) {
+  private static void getAllRecordedEvents(RecordServiceBlockingStub pomodoroStub) {
     GetEventsResponse eventsResponse = pomodoroStub.getEvents(Empty.newBuilder().build());
     printEvents(eventsResponse);
   }
@@ -57,6 +63,7 @@ public class PomodoroClient {
 
     for (Event event : response.getEventList()) {
       System.out.println("Event #" + count + " " + event.getStartDate() + " - " + event.getEndDate());
+      count ++;
     }
   }
 
@@ -66,7 +73,7 @@ public class PomodoroClient {
         .usePlaintext()
         .build();
 
-    PomodoroBlockingStub pomodoroStub = PomodoroGrpc.newBlockingStub(channel);
+    RecordServiceBlockingStub pomodoroStub = RecordServiceGrpc.newBlockingStub(channel);
 
     recordEvents(pomodoroStub);
 
