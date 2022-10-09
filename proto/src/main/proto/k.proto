@@ -8,16 +8,54 @@ package kapp;
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-service Pomodoro {
-  rpc recordEvent(Event) returns (google.protobuf.Empty);
+service EventProcessor {
+  rpc processEvent(ProcessEventRequest) returns (google.protobuf.Empty);
+}
+
+service RecordService {
+  rpc storeEvent(StoreEventRequest) returns (google.protobuf.Empty);
   rpc getEvents(google.protobuf.Empty) returns (GetEventsResponse);
 }
+
+service StatsService {
+  rpc updateStats(UpdateStatsRequest) returns (google.protobuf.Empty);
+  rpc getStats(GetStatsRequest) returns (GetStatsResponse);
+}
+
+
+// Request / Response messages
+
+message ProcessEventRequest {
+  Event event = 1;
+}
+
+message StoreEventRequest {
+  Event event = 1;
+}
+
+message GetEventsResponse {
+  repeated Event event = 1;
+}
+
+message UpdateStatsRequest {
+  Event event = 1;
+}
+
+message GetStatsRequest {
+
+}
+
+message GetStatsResponse {
+  EventCount eventCount = 1;
+}
+
+// Data structures
 
 message Event {
   google.protobuf.Timestamp startDate = 1;
   google.protobuf.Timestamp endDate = 2;
 }
 
-message GetEventsResponse {
-  repeated Event event = 1;
+message EventCount {
+  int32 count = 1;
 }
