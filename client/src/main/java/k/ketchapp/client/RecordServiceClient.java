@@ -73,11 +73,11 @@ public class RecordServiceClient {
         .usePlaintext()
         .build();
 
-    RecordServiceBlockingStub pomodoroStub = RecordServiceGrpc.newBlockingStub(channel);
+    RecordServiceBlockingStub recordServiceBlockingStub = RecordServiceGrpc.newBlockingStub(channel);
 
-    recordEvents(pomodoroStub);
+    recordEvents(recordServiceBlockingStub);
 
-    getAllRecordedEvents(pomodoroStub);
+    getAllRecordedEvents(recordServiceBlockingStub);
 
     channel.shutdown();
   }

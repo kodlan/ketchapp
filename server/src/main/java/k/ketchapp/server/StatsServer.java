@@ -2,27 +2,27 @@ package k.ketchapp.server;
 
 import io.grpc.BindableService;
 import java.io.IOException;
-import k.ketchapp.service.recordservice.RecordService;
+import k.ketchapp.service.statsservice.StatsService;
 
-public class RecordServer extends AbstractServer {
+public class StatsServer extends AbstractServer {
 
   @Override
   protected String getServerName() {
-    return "RecordServer";
+    return "StatsServer";
   }
 
   @Override
   protected int getPort() {
-    return 50006;
+    return 50008;
   }
 
   @Override
   protected BindableService getService() {
-    return new RecordService();
+    return new StatsService();
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
-    RecordServer recordServer = new RecordServer();
-    recordServer.startAndBlock();
+    StatsServer statsServer = new StatsServer();
+    statsServer.startAndBlock();
   }
 }
