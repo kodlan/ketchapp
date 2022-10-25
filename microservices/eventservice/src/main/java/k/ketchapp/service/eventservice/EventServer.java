@@ -1,10 +1,10 @@
-package k.ketchapp.server;
+package k.ketchapp.service.eventservice;
 
 import io.grpc.BindableService;
 import java.io.IOException;
-import k.ketchapp.service.eventprocessor.EventProcessor;
+import k.ketchapp.server.AbstractServer;
 
-public class EventProcessorServer extends AbstractServer {
+public class EventServer extends AbstractServer {
 
   @Override
   protected String getServerName() {
@@ -18,11 +18,11 @@ public class EventProcessorServer extends AbstractServer {
 
   @Override
   protected BindableService getService() {
-    return new EventProcessor();
+    return new EventService();
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
-    EventProcessorServer eventProcessorServer = new EventProcessorServer();
-    eventProcessorServer.startAndBlock();
+    EventServer eventServer = new EventServer();
+    eventServer.startAndBlock();
   }
 }

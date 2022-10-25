@@ -25,3 +25,7 @@ hs_err_pid*
 /.idea/
 /server/target/
 /client/target/
+/microservices/common/target/
+/microservices/eventservice/target/
+/microservices/recordservice/target/
+/microservices/statsservice/target/

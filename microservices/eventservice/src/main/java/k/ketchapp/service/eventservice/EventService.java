@@ -1,4 +1,4 @@
-package k.ketchapp.service.eventprocessor;
+package k.ketchapp.service.eventservice;
 
 import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
@@ -15,11 +15,10 @@ import k.ketchapp.proto.StatsServiceGrpc;
 import k.ketchapp.proto.StatsServiceGrpc.StatsServiceBlockingStub;
 import k.ketchapp.proto.StoreEventRequest;
 import k.ketchapp.proto.UpdateStatsRequest;
-import k.ketchapp.service.recordservice.RecordService;
 
-public class EventProcessor extends EventProcessorGrpc.EventProcessorImplBase {
+public class EventService extends EventProcessorGrpc.EventProcessorImplBase {
 
-  private static final Logger logger = Logger.getLogger(RecordService.class.getName());
+  private static final Logger logger = Logger.getLogger(EventService.class.getName());
 
   // TODO: when to close this channel? what is lifecycle of this object?
   ManagedChannel recordServiceChannel = ManagedChannelBuilder
