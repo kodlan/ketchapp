@@ -1,8 +1,8 @@
-package k.ketchapp.server;
+package k.ketchapp.service.statsservice;
 
 import io.grpc.BindableService;
 import java.io.IOException;
-import k.ketchapp.service.statsservice.StatsService;
+import k.ketchapp.server.AbstractServer;
 
 public class StatsServer extends AbstractServer {
 

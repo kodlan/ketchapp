@@ -1,10 +1,12 @@
 ### Modules:
 
-- proto
-- server
-- cli-client
-- web-client
 - client - some testing code for now
+- documentation
+- microservices
+  - common
+  - eventservice
+  - recordservice
+  - statsservice
 
 ## Draft microservice structure:
 
@@ -18,7 +20,7 @@
                                           |  |
                                           |  |
          +---------------+                |  |
-         |Event Processor+----------------+  +--------------------+--------------+
+         |Event Service  +----------------+  +--------------------+--------------+
          +--+---------+--+                                        |              |
             |         |                                           |              |
             |         +-------------------+                       |              |
@@ -33,7 +35,7 @@
   +---------+       +--------+       +---------------+        +-------+       +-------+
 ```
 
-### EventProcessor
+### EventService
 Processes all incoming event objects. Works as frontend 
 before other services that do actual event processing:
 - Record service

@@ -1,8 +1,8 @@
-package k.ketchapp.server;
+package k.ketchapp.service.recordservice;
 
 import io.grpc.BindableService;
 import java.io.IOException;
-import k.ketchapp.service.recordservice.RecordService;
+import k.ketchapp.server.AbstractServer;
 
 public class RecordServer extends AbstractServer {
 

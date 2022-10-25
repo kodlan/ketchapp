@@ -17,8 +17,12 @@
 
     <modules>
         <module>proto</module>
-        <module>server</module>
       <module>client</module>
+      <module>microservices</module>
+        <module>microservices/statsservice</module>
+        <module>microservices/eventservice</module>
+        <module>microservices/recordservice</module>
+        <module>microservices/common</module>
     </modules>
 
 </project>
