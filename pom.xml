@@ -16,13 +16,13 @@
     </properties>
 
     <modules>
-        <module>proto</module>
+      <module>proto</module>
       <module>client</module>
       <module>microservices</module>
-        <module>microservices/statsservice</module>
-        <module>microservices/eventservice</module>
-        <module>microservices/recordservice</module>
-        <module>microservices/common</module>
+      <module>microservices/common</module>
+      <module>microservices/statsservice</module>
+      <module>microservices/eventservice</module>
+      <module>microservices/recordservice</module>
     </modules>
 
 </project>
