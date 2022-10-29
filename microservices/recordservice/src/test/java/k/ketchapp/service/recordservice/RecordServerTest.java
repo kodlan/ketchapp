@@ -1,5 +1,6 @@
 package k.ketchapp.service.recordservice;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.protobuf.Empty;
@@ -51,7 +52,7 @@ public class RecordServerTest {
 
     Empty emptyResponse = blockingStub.storeEvent(storeEventRequest);
 
-    assertNotNull(emptyResponse);
+    assertNull(emptyResponse);
   }
 
   private static StoreEventRequest generateRandomRequest() {
