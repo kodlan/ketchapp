@@ -1,6 +1,8 @@
 package k.ketchapp.service.recordservice;
 
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.protobuf.Empty;
@@ -12,20 +14,31 @@ import io.grpc.testing.GrpcCleanupRule;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Random;
 import k.ketchapp.proto.Event;
+import k.ketchapp.proto.GetEventsResponse;
 import k.ketchapp.proto.RecordServiceGrpc;
 import k.ketchapp.proto.StoreEventRequest;
+import k.ketchapp.service.recordservice.dao.RecordDao;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RecordServerTest {
 
   @Rule
   public final GrpcCleanupRule grpcCleanupRule = new GrpcCleanupRule();
 
   private Channel channel;
+
+  @Mock
+  private RecordDao recordDao;
 
   @Before
   public void setUp() throws Exception {
@@ -34,7 +47,7 @@ public class RecordServerTest {
     grpcCleanupRule.register(InProcessServerBuilder
         .forName(serverName)
         .directExecutor()
-        .addService(new RecordService())
+        .addService(new RecordService(recordDao))
         .build()
         .start());
 
@@ -45,17 +58,34 @@ public class RecordServerTest {
   }
 
   @Test
-  public void storeEvent() {
+  public void storeEventTest() {
     RecordServiceGrpc.RecordServiceBlockingStub blockingStub = RecordServiceGrpc.newBlockingStub(channel);
 
     StoreEventRequest storeEventRequest = generateRandomRequest();
 
     Empty emptyResponse = blockingStub.storeEvent(storeEventRequest);
 
+    Mockito.verify(recordDao).saveEvent(storeEventRequest.getEvent());
     assertNotNull(emptyResponse);
   }
 
-  private static StoreEventRequest generateRandomRequest() {
+  @Test
+  public void getEventsTest() {
+    RecordServiceGrpc.RecordServiceBlockingStub blockingStub = RecordServiceGrpc.newBlockingStub(channel);
+
+    List<Event> eventList = List.of(generateRandomEvent(), generateRandomEvent(), generateRandomEvent());
+    Mockito.when(recordDao.getEvents()).thenReturn(eventList);
+
+    GetEventsResponse getEventsResponse = blockingStub.getEvents(Empty.newBuilder().build());
+
+    Mockito.verify(recordDao).getEvents();
+    assertNotNull(getEventsResponse);
+    assertEquals(eventList, getEventsResponse.getEventList());
+    assertTrue("Some additional elements present in returned list", eventList.containsAll(getEventsResponse.getEventList()));
+    assertTrue("Some elements are missing in the returned list", getEventsResponse.getEventList().containsAll(eventList));
+  }
+
+  private static Event generateRandomEvent() {
     Random rnd = new Random();
 
     LocalDateTime now = LocalDateTime.now();
@@ -75,13 +105,15 @@ public class RecordServerTest {
         .setNanos(endInstant.getNano())
         .build();
 
-    Event event =  Event.newBuilder()
+    return Event.newBuilder()
         .setStartDate(startTimestamp)
         .setEndDate(endTimestamp)
         .build();
+  }
 
+  private static StoreEventRequest generateRandomRequest() {
     return StoreEventRequest.newBuilder()
-        .setEvent(event)
+        .setEvent(generateRandomEvent())
         .build();
   }
 }
