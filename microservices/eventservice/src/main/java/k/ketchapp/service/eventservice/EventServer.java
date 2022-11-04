@@ -8,7 +8,7 @@ public class EventServer extends AbstractServer {
 
   @Override
   protected String getServerName() {
-    return "EventProcessor";
+    return "EventServer";
   }
 
   @Override

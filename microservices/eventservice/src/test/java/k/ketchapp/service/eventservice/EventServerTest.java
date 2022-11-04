@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Random;
 import k.ketchapp.proto.Event;
-import k.ketchapp.proto.EventProcessorGrpc;
+import k.ketchapp.proto.EventServiceGrpc;
 import k.ketchapp.proto.ProcessEventRequest;
 import k.ketchapp.proto.RecordServiceGrpc;
 import k.ketchapp.proto.StatsServiceGrpc;
@@ -47,8 +47,8 @@ public class EventServerTest {
    * change real channels with channels for in process communication.
    * This channels will be called to communicate with RecordSevice and StatsService
    */
-  private final EventProcessorGrpc.EventProcessorImplBase mockEventService =
-      mock(EventProcessorGrpc.EventProcessorImplBase.class, delegatesTo(
+  private final EventServiceGrpc.EventServiceImplBase mockEventService =
+      mock(EventServiceGrpc.EventServiceImplBase.class, delegatesTo(
           new EventService() {
 
             {
@@ -121,7 +121,7 @@ public class EventServerTest {
 
   @Test
   public void processEventTest() {
-    EventProcessorGrpc.EventProcessorBlockingStub blockingStub = EventProcessorGrpc.newBlockingStub(channel);
+    EventServiceGrpc.EventServiceBlockingStub blockingStub = EventServiceGrpc.newBlockingStub(channel);
 
     Event event = generateRandomEvent();
 
