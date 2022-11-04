@@ -3,6 +3,7 @@ package k.ketchapp.service.statsservice;
 import io.grpc.BindableService;
 import java.io.IOException;
 import k.ketchapp.server.AbstractServer;
+import k.ketchapp.service.statsservice.dao.StatsDao;
 
 public class StatsServer extends AbstractServer {
 
@@ -18,7 +19,9 @@ public class StatsServer extends AbstractServer {
 
   @Override
   protected BindableService getService() {
-    return new StatsService();
+    // TODO: use DI framework to inject this
+    StatsDao statsDao = new StatsDao();
+    return new StatsService(statsDao);
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
