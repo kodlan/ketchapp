@@ -8,7 +8,7 @@ package kapp;
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-service EventProcessor {
+service EventService {
   rpc processEvent(ProcessEventRequest) returns (google.protobuf.Empty);
 }
 

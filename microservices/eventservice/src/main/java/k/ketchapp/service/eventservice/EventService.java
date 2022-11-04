@@ -7,7 +7,7 @@ import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import k.ketchapp.proto.Event;
-import k.ketchapp.proto.EventProcessorGrpc;
+import k.ketchapp.proto.EventServiceGrpc;
 import k.ketchapp.proto.ProcessEventRequest;
 import k.ketchapp.proto.RecordServiceGrpc;
 import k.ketchapp.proto.RecordServiceGrpc.RecordServiceBlockingStub;
@@ -16,7 +16,7 @@ import k.ketchapp.proto.StatsServiceGrpc.StatsServiceBlockingStub;
 import k.ketchapp.proto.StoreEventRequest;
 import k.ketchapp.proto.UpdateStatsRequest;
 
-public class EventService extends EventProcessorGrpc.EventProcessorImplBase {
+public class EventService extends EventServiceGrpc.EventServiceImplBase {
 
   private static final Logger logger = Logger.getLogger(EventService.class.getName());
 
