@@ -33,7 +33,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EventServerTest {
+public class EventServiceTest {
 
   @Rule
   public final GrpcCleanupRule grpcCleanupRule = new GrpcCleanupRule();
