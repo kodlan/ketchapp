@@ -4,7 +4,6 @@ import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import k.ketchapp.proto.Event;
 import k.ketchapp.proto.EventServiceGrpc;
@@ -33,8 +32,6 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
 
   @Override
   public void processEvent(ProcessEventRequest request, StreamObserver<Empty> responseObserver) {
-    logger.log(Level.INFO, "Processing event: " + request.getEvent());
-
     Event event = request.getEvent();
 
     callStoreService(event);
@@ -46,7 +43,7 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
   }
 
   private void callStoreService(Event event) {
-    logger.log(Level.INFO, "Storing event: " + event);
+    logger.info("Calling RecordService with event: " + event);
     RecordServiceBlockingStub recordServiceBlockingStub = RecordServiceGrpc.newBlockingStub(recordServiceChannel);
 
     StoreEventRequest storeEventRequest = StoreEventRequest.newBuilder()
@@ -58,7 +55,7 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
   }
 
   private void callStatsService(Event event) {
-    logger.log(Level.INFO, "Updating stats with event: " + event);
+    logger.info("Calling StatsService with event: " + event);
     StatsServiceBlockingStub statsServiceBlockingStub = StatsServiceGrpc.newBlockingStub(statsServiceChannel);
 
     UpdateStatsRequest updateStatsRequest = UpdateStatsRequest.newBuilder()

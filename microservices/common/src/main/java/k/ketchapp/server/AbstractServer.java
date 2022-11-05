@@ -3,11 +3,14 @@ package k.ketchapp.server;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.ServerInterceptor;
+import io.grpc.ServerInterceptors;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import k.ketchapp.functional.ThrowingRunnable;
+import k.ketchapp.server.logging.LoggingInterceptor;
 
 public abstract class AbstractServer {
 
@@ -31,9 +34,14 @@ public abstract class AbstractServer {
 
     logger.log(Level.INFO, "Building a " + getServerName() + "  server...");
 
+    BindableService service = getService();
+
+    ServerInterceptor interceptor = new LoggingInterceptor();
+
     server = ServerBuilder
         .forPort(port)
-        .addService(getService())
+        .addService(service)
+        .addService(ServerInterceptors.intercept(service, interceptor))
         .build()
         .start();
 
