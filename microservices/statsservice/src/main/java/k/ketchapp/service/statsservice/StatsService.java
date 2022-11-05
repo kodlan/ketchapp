@@ -15,7 +15,7 @@ public class StatsService extends StatsServiceGrpc.StatsServiceImplBase {
 
   private static final Logger logger = Logger.getLogger(StatsService.class.getName());
 
-  private StatsDao statsDao;
+  private final StatsDao statsDao;
 
   public StatsService(StatsDao statsDao) {
     this.statsDao = statsDao;
@@ -23,8 +23,6 @@ public class StatsService extends StatsServiceGrpc.StatsServiceImplBase {
 
   @Override
   public void updateStats(UpdateStatsRequest request, StreamObserver<Empty> responseObserver) {
-    logger.log(Level.INFO, "Updating stats with event: " + request.getEvent());
-
     statsDao.incrementCounter();
 
     responseObserver.onNext(Empty.newBuilder().build());
@@ -33,8 +31,6 @@ public class StatsService extends StatsServiceGrpc.StatsServiceImplBase {
 
   @Override
   public void getStats(GetStatsRequest request, StreamObserver<GetStatsResponse> responseObserver) {
-    logger.log(Level.INFO, "Getting stats");
-
     int events = statsDao.getEventCounter();
 
     EventCount eventCount = EventCount.newBuilder()
