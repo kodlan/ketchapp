@@ -3,7 +3,10 @@ package k.ketchapp.service.eventservice;
 import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status.Code;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import k.ketchapp.proto.Event;
 import k.ketchapp.proto.EventServiceGrpc;
@@ -17,6 +20,7 @@ import k.ketchapp.proto.UpdateStatsRequest;
 
 public class EventService extends EventServiceGrpc.EventServiceImplBase {
 
+  private static final int DEADLINE_MS = 2 * 1000;
   private static final Logger logger = Logger.getLogger(EventService.class.getName());
 
   // TODO: when to close this channel? what is lifecycle of this object?
@@ -34,9 +38,31 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
   public void processEvent(ProcessEventRequest request, StreamObserver<Empty> responseObserver) {
     Event event = request.getEvent();
 
-    callStoreService(event);
+    try {
+      callStoreService(event);
+    } catch (StatusRuntimeException e) {
+      if (e.getStatus().getCode() == Code.DEADLINE_EXCEEDED) {
+        logger.info("callStoreService() call failed with DEADLINE_EXCEEDED");
+        responseObserver.onError(e);
+      } else {
+        logger.info("Unspecified error from callStoreService(): " + e.getMessage());
+        responseObserver.onError(e);
+      }
+      return;
+    }
 
-    callStatsService(event);
+    try {
+      callStatsService(event);
+    } catch (StatusRuntimeException e) {
+      if (e.getStatus().getCode() == Code.DEADLINE_EXCEEDED) {
+        logger.info("callStatsService() call failed with DEADLINE_EXCEEDED");
+        responseObserver.onError(e);
+      } else {
+        logger.info("Unspecified error from callStatsService(): " + e.getMessage());
+        responseObserver.onError(e);
+      }
+      return;
+    }
 
     responseObserver.onNext(Empty.newBuilder().build());
     responseObserver.onCompleted();
@@ -51,7 +77,9 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
         .build();
 
     //noinspection ResultOfMethodCallIgnored
-    recordServiceBlockingStub.storeEvent(storeEventRequest);
+    recordServiceBlockingStub
+        .withDeadlineAfter(DEADLINE_MS, TimeUnit.MILLISECONDS)
+        .storeEvent(storeEventRequest);
   }
 
   private void callStatsService(Event event) {
@@ -63,6 +91,8 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
         .build();
 
     //noinspection ResultOfMethodCallIgnored
-    statsServiceBlockingStub.updateStats(updateStatsRequest);
+    statsServiceBlockingStub
+        .withDeadlineAfter(DEADLINE_MS, TimeUnit.MILLISECONDS)
+        .updateStats(updateStatsRequest);
   }
 }
