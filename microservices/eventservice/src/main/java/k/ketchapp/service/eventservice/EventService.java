@@ -4,8 +4,8 @@ import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status.Code;
-import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import k.ketchapp.proto.Event;
@@ -38,31 +38,29 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
   public void processEvent(ProcessEventRequest request, StreamObserver<Empty> responseObserver) {
     Event event = request.getEvent();
 
-    try {
-      callStoreService(event);
-    } catch (StatusRuntimeException e) {
-      if (e.getStatus().getCode() == Code.DEADLINE_EXCEEDED) {
-        logger.info("callStoreService() call failed with DEADLINE_EXCEEDED");
-        responseObserver.onError(e);
-      } else {
-        logger.info("Unspecified error from callStoreService(): " + e.getMessage());
-        responseObserver.onError(e);
-      }
-      return;
-    }
+    FunctionalGprsErrorHandler.handleGrpcError(
 
-    try {
-      callStatsService(event);
-    } catch (StatusRuntimeException e) {
-      if (e.getStatus().getCode() == Code.DEADLINE_EXCEEDED) {
-        logger.info("callStatsService() call failed with DEADLINE_EXCEEDED");
-        responseObserver.onError(e);
-      } else {
-        logger.info("Unspecified error from callStatsService(): " + e.getMessage());
-        responseObserver.onError(e);
-      }
-      return;
-    }
+        () -> callStoreService(event),
+
+        Map.of(
+            Code.DEADLINE_EXCEEDED, () -> logger.info("callStoreService() call failed with DEADLINE_EXCEEDED"),
+            Code.ABORTED, () -> logger.info("callStoreService() call failed with ABORTED")
+        ),
+        responseObserver::onError,
+        (exception) -> logger.info("Unspecified error from callStoreService(): " + exception)
+
+    ).andThen(
+
+        () -> callStatsService(event),
+
+        Map.of(
+            Code.DEADLINE_EXCEEDED, () -> logger.info("callStatsService() call failed with DEADLINE_EXCEEDED"),
+            Code.ABORTED, () -> logger.info("callStatsService() call failed with ABORTED")
+        ),
+        responseObserver::onError,
+        (exception) -> logger.info("Unspecified error from callStatsService(): " + exception)
+
+    );
 
     responseObserver.onNext(Empty.newBuilder().build());
     responseObserver.onCompleted();
