@@ -49,7 +49,7 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
         responseObserver::onError,
         (exception) -> logger.info("Unspecified error from callStoreService(): " + exception)
 
-    ).andThen(
+    ).andThenCall(
 
         () -> callStatsService(event),
 

@@ -7,10 +7,10 @@ import java.util.function.Consumer;
 
 @FunctionalInterface
 interface FunctionalGprsErrorHandler {
-  void executeWithError() throws StatusRuntimeException;
+  void call() throws StatusRuntimeException;
 
   @SuppressWarnings("UnusedReturnValue")
-  default FunctionalGprsErrorHandler andThen(FunctionalGprsErrorHandler handler, Map<Code, Runnable> codeToHandlerMap,
+  default FunctionalGprsErrorHandler andThenCall(FunctionalGprsErrorHandler handler, Map<Code, Runnable> codeToHandlerMap,
       Consumer<StatusRuntimeException> commonHandler, Consumer<StatusRuntimeException> handlerNotFoundAction) {
     return handleGrpcError(handler, codeToHandlerMap, commonHandler, handlerNotFoundAction);
   }
@@ -19,7 +19,7 @@ interface FunctionalGprsErrorHandler {
       Consumer<StatusRuntimeException> commonHandler, Consumer<StatusRuntimeException> handlerNotFoundAction) {
 
     try {
-      handler.executeWithError();
+      handler.call();
     } catch (StatusRuntimeException exception) {
       Runnable codeHandler = codeToHandlerMap.get(exception.getStatus().getCode());
 
@@ -39,12 +39,12 @@ interface FunctionalGprsErrorHandler {
   class NoAndThenGrpcErrorHandler implements FunctionalGprsErrorHandler {
 
     @Override
-    public void executeWithError() throws StatusRuntimeException {
+    public void call() throws StatusRuntimeException {
       // do nothing
     }
 
     @Override
-    public FunctionalGprsErrorHandler andThen(FunctionalGprsErrorHandler handler, Map<Code, Runnable> codeToHandlerMap,
+    public FunctionalGprsErrorHandler andThenCall(FunctionalGprsErrorHandler handler, Map<Code, Runnable> codeToHandlerMap,
         Consumer<StatusRuntimeException> commonHandler,
         Consumer<StatusRuntimeException> handlerNotFoundAction) {
       // do nothing
