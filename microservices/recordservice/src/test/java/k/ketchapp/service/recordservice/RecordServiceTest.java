@@ -89,8 +89,8 @@ public class RecordServiceTest {
     Random rnd = new Random();
 
     LocalDateTime now = LocalDateTime.now();
-    LocalDateTime start = now.minusHours(rnd.nextInt() % 10);
-    LocalDateTime end = start.plusMinutes(10 + rnd.nextInt() % 49);
+    LocalDateTime start = now.minusHours(rnd.nextInt(10));
+    LocalDateTime end = start.plusMinutes(10 + rnd.nextInt(49));
 
     Instant startInstant = start.toInstant(ZoneOffset.UTC);
     Instant endInstant = end.toInstant(ZoneOffset.UTC);
