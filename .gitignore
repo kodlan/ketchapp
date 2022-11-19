@@ -29,3 +29,5 @@ hs_err_pid*
 /microservices/eventservice/target/
 /microservices/recordservice/target/
 /microservices/statsservice/target/
+/microservices/target/
+/target/
