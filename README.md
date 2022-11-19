@@ -1,9 +1,24 @@
 # ketchapp
 Pet project for yet another pomodoro app :) - cloud-first microservices demo application.
 
-<b>Technologies used:</b> Java, gRPC
+<b>Technologies used:</b> 
+* Java
+* gRPC
+  * [Unit tests](https://github.com/kodlan/ketchapp/tree/master/microservices/eventservice/src/test/java/k/ketchapp/service/eventservice)
+  * [Deadlines](https://github.com/kodlan/ketchapp/blob/master/microservices/eventservice/src/main/java/k/ketchapp/service/eventservice/EventService.java)
+  * Error handling (TBD)
+  * [Logging interceptor](https://github.com/kodlan/ketchapp/blob/master/microservices/common/src/main/java/k/ketchapp/server/logging/LoggingInterceptor.java)
+  * Cancellation (TBD)
+  * Health checks (TBD)
+  * Tracing (Jaeger?) (TBD)
+  * Metrics (TBD)
+  * Load balancing (TBD)
+  * Sagas (TBD)
+  * mTLS (TBD)
+  * Authentication (TBD)
 
 Plans include following technologies into this project:
+* Go (Go microservice, Go CLI)
 * Kubernetes
 * Skaffold or Helm
 * Istio
