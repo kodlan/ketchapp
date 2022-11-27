@@ -47,3 +47,11 @@ Plans include following technologies into this project:
      +---------+       +--------+       +---------------+        +-------+       +-------+
 ```
 See [this README.md](./documentation/) for details.
+
+## Building Docker images manually
+From the project root folder:
+```
+docker build -t ketchapp/app:latest .
+cd microservices/recordservice
+docker build -t ketchapp/recordservice:latest .
+```
