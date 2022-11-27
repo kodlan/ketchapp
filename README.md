@@ -16,6 +16,8 @@ Pet project for yet another pomodoro app :) - cloud-first microservices demo app
   * Sagas (TBD)
   * mTLS (TBD)
   * Authentication (TBD)
+* Docker
+  * Multi-stage build ([builder image](https://github.com/kodlan/ketchapp/blob/master/Dockerfile), [RecordService image](https://github.com/kodlan/ketchapp/blob/master/microservices/recordservice/Dockerfile))
 
 Plans include following technologies into this project:
 * Go (Go microservice, Go CLI)
@@ -47,3 +49,11 @@ Plans include following technologies into this project:
      +---------+       +--------+       +---------------+        +-------+       +-------+
 ```
 See [this README.md](./documentation/) for details.
+
+## Building Docker images manually
+From the project root folder:
+```
+docker build -t ketchapp/app:latest .
+cd microservices/recordservice
+docker build -t ketchapp/recordservice:latest .
+```
