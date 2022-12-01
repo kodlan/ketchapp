@@ -60,4 +60,7 @@ docker build -t ketchapp/recordservice:latest .
 
 cd ../statsservice
 docker build -t ketchapp/statsservice:latest .
+
+cd ../eventservice
+docker build -t ketchapp/eventservice:latest .
 ```
