@@ -54,6 +54,10 @@ See [this README.md](./documentation/) for details.
 From the project root folder:
 ```
 docker build -t ketchapp/app:latest .
+
 cd microservices/recordservice
 docker build -t ketchapp/recordservice:latest .
+
+cd ../statsservice
+docker build -t ketchapp/statsservice:latest .
 ```
