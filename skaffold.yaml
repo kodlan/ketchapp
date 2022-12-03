@@ -1,0 +1,33 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+
+metadata:
+  name: ketchapp
+
+build:
+  artifacts:
+    - image: ketchapp/app
+      docker:
+        dockerfile: Dockerfile
+
+    - image: ketchapp/recordservice
+      requires:
+        - image: ketchapp/app
+          alias: baseapp
+      context: microservices/recordservice/
+
+    - image: ketchapp/statsservice
+      requires:
+        - image: ketchapp/app
+          alias: baseapp
+      context: microservices/statsservice/
+
+    - image: ketchapp/eventservice
+      requires:
+        - image: ketchapp/app
+          alias: baseapp
+      context: microservices/eventservice/
+
+  local:
+    useBuildkit: true
+    push: false
