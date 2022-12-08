@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:19-jre-alpine
 
 ENV BUILDER_HOME=/home/usr/app
 ENV HOME=/home/usr/app

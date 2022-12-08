@@ -10,7 +10,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>eventservice</artifactId>
+  <artifactId>achievementservice</artifactId>
 
   <dependencies>
     <dependency>
@@ -84,9 +84,17 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>k.ketchapp.service.eventservice.EventServer</mainClass>
+              <mainClass>k.ketchapp.service.achievementservice.AchievementService</mainClass>
             </manifest>
           </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>19</source>
+          <target>19</target>
         </configuration>
       </plugin>
 
