@@ -31,3 +31,4 @@ hs_err_pid*
 /microservices/statsservice/target/
 /microservices/target/
 /target/
+/microservices/achievementservice/target/

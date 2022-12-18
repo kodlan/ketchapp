@@ -63,4 +63,7 @@ docker build -t ketchapp/statsservice:latest .
 
 cd ../eventservice
 docker build -t ketchapp/eventservice:latest .
+
+cd ../achievementservice
+docker build -t ketchapp/achievementservice:latest .
 ```

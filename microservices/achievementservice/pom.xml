@@ -63,7 +63,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>k.ketchapp.service.recordservice.RecordServer</mainClass>
+              <mainClass>k.ketchapp.service.achievementservice.AchievementServer</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -85,7 +85,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>k.ketchapp.service.recordservice.RecordServer</mainClass>
+              <mainClass>k.ketchapp.service.achievementservice.AchievementServer</mainClass>
             </manifest>
           </archive>
         </configuration>
