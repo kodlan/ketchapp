@@ -23,6 +23,7 @@
     <module>microservices/statsservice</module>
     <module>microservices/eventservice</module>
     <module>microservices/recordservice</module>
+    <module>microservices/achievementservice</module>
   </modules>
 
   <build>

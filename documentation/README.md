@@ -63,8 +63,9 @@ Update stats with each event.
 Get the list of possible achievements, and track current progress
 
 #### Methods:
-* `List<Achievement> getAchivements()`
-* `AchievementsProgress getAchievement(Achievement achievement)`
+* `List<Achievement> getAchievements()`
+* `AchievementsProgress getAchievementProgress(Achievement achievement)`
+* `updateAchievements(Event event)`
 
 ### User service
 Handle user creation, login, etc. 
