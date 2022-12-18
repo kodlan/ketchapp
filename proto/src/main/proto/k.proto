@@ -87,7 +87,12 @@ message EventCount {
 
 message Achievement {
   int32 id = 1;
-  string name = 2;
+  int32 name_id = 2;
+  // using name_id with int32 type
+  // as string name = 2 is causing error:
+  // java: cannot find symbol
+  // symbol:   method isStringEmpty(java.lang.Object)
+  // this might get fixed in Update gRPC #52 issue
 }
 
 message AchievementProgress {
