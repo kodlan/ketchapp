@@ -22,6 +22,11 @@ service StatsService {
   rpc getStats(GetStatsRequest) returns (GetStatsResponse);
 }
 
+service AchievementService {
+  rpc getAchievements(GetAchievementRequest) returns (GetAchievementResponse);
+  rpc getAchievementProgress(GetAchievementProgressRequest) returns (GetAchievementProgressResponse);
+  rpc updateAchievements(UpdateAchievementsRequest) returns (google.protobuf.Empty);
+}
 
 // Request / Response messages
 
@@ -49,6 +54,26 @@ message GetStatsResponse {
   EventCount eventCount = 1;
 }
 
+message GetAchievementRequest {
+
+}
+
+message GetAchievementResponse {
+  repeated Achievement achievement = 1;
+}
+
+message GetAchievementProgressRequest {
+  Achievement achievement = 1;
+}
+
+message GetAchievementProgressResponse {
+  AchievementProgress achievementProgress = 1;
+}
+
+message UpdateAchievementsRequest {
+  Event event = 1;
+}
+
 // Data structures
 
 message Event {
@@ -58,4 +83,19 @@ message Event {
 
 message EventCount {
   int32 count = 1;
+}
+
+message Achievement {
+  int32 id = 1;
+  int32 name_id = 2;
+  // using name_id with int32 type
+  // as string name = 2 is causing error:
+  // java: cannot find symbol
+  // symbol:   method isStringEmpty(java.lang.Object)
+  // this might get fixed in Update gRPC #52 issue
+}
+
+message AchievementProgress {
+  bool completed = 1;
+  int32 progress = 2;
 }

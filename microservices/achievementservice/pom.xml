@@ -10,7 +10,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>eventservice</artifactId>
+  <artifactId>achievementservice</artifactId>
 
   <dependencies>
     <dependency>
@@ -50,6 +50,7 @@
       <version>4.8.0</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -62,7 +63,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>k.ketchapp.service.eventservice.EventServer</mainClass>
+              <mainClass>k.ketchapp.service.recordservice.RecordServer</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -84,7 +85,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>k.ketchapp.service.eventservice.EventServer</mainClass>
+              <mainClass>k.ketchapp.service.recordservice.RecordServer</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -92,5 +93,4 @@
 
     </plugins>
   </build>
-
 </project>
