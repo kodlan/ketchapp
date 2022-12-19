@@ -4,15 +4,21 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.google.protobuf.Empty;
 import io.grpc.Channel;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.testing.GrpcCleanupRule;
 import java.util.List;
 import k.ketchapp.proto.Achievement;
+import k.ketchapp.proto.AchievementProgress;
 import k.ketchapp.proto.AchievementServiceGrpc;
+import k.ketchapp.proto.Event;
+import k.ketchapp.proto.GetAchievementProgressRequest;
+import k.ketchapp.proto.GetAchievementProgressResponse;
 import k.ketchapp.proto.GetAchievementRequest;
 import k.ketchapp.proto.GetAchievementResponse;
+import k.ketchapp.proto.UpdateAchievementRequest;
 import k.ketchapp.service.achievementservice.dao.AchievementDao;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +57,7 @@ public class AchievementServiceTest {
   }
 
   @Test
-  public void getEventsTest() {
+  public void getAchievementsTest() {
     AchievementServiceGrpc.AchievementServiceBlockingStub blockingStub = AchievementServiceGrpc.newBlockingStub(channel);
 
     List<Achievement> achievements = List.of(Achievement.newBuilder()
@@ -70,5 +76,47 @@ public class AchievementServiceTest {
     assertEquals(achievements, getAchievementResponse.getAchievementList());
     assertTrue("Some additional elements present in returned list", achievements.containsAll(getAchievementResponse.getAchievementList()));
     assertTrue("Some elements are missing in the returned list", getAchievementResponse.getAchievementList().containsAll(achievements));
+  }
+
+  @Test
+  public void getAchievementProgress() {
+    AchievementServiceGrpc.AchievementServiceBlockingStub blockingStub = AchievementServiceGrpc.newBlockingStub(channel);
+
+    Achievement achievement = Achievement.newBuilder()
+        .setId(1)
+        .build();
+
+    GetAchievementProgressRequest request = GetAchievementProgressRequest.newBuilder()
+        .setAchievement(achievement)
+        .build();
+
+    AchievementProgress progress = AchievementProgress.newBuilder()
+        .setProgress(65)
+        .setCompleted(false)
+        .build();
+
+    Mockito.when(achievementDao.getAchievementProgress(achievement)).thenReturn(progress);
+
+    GetAchievementProgressResponse getAchievementProgressResponse = blockingStub.getAchievementProgress(request);
+
+    Mockito.verify(achievementDao).getAchievementProgress(achievement);
+    assertNotNull(getAchievementProgressResponse);
+    assertEquals(progress, getAchievementProgressResponse.getAchievementProgress());
+  }
+
+  @Test
+  public void updateAchievementsTest() {
+    AchievementServiceGrpc.AchievementServiceBlockingStub blockingStub = AchievementServiceGrpc.newBlockingStub(channel);
+
+    Event event = Event.newBuilder().build();
+
+    UpdateAchievementRequest request = UpdateAchievementRequest.newBuilder()
+        .setEvent(event)
+        .build();
+
+    Empty empty = blockingStub.updateAchievements(request);
+
+    Mockito.verify(achievementDao).updateAchievement(event);
+    assertNotNull(empty);
   }
 }

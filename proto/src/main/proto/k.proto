@@ -25,7 +25,7 @@ service StatsService {
 service AchievementService {
   rpc getAchievements(GetAchievementRequest) returns (GetAchievementResponse);
   rpc getAchievementProgress(GetAchievementProgressRequest) returns (GetAchievementProgressResponse);
-  rpc updateAchievements(UpdateAchievementsRequest) returns (google.protobuf.Empty);
+  rpc updateAchievements(UpdateAchievementRequest) returns (google.protobuf.Empty);
 }
 
 // Request / Response messages
@@ -70,7 +70,7 @@ message GetAchievementProgressResponse {
   AchievementProgress achievementProgress = 1;
 }
 
-message UpdateAchievementsRequest {
+message UpdateAchievementRequest {
   Event event = 1;
 }
 
