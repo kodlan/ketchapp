@@ -12,7 +12,7 @@ import k.ketchapp.proto.GetAchievementProgressRequest;
 import k.ketchapp.proto.GetAchievementProgressResponse;
 import k.ketchapp.proto.GetAchievementRequest;
 import k.ketchapp.proto.GetAchievementResponse;
-import k.ketchapp.proto.UpdateAchievementsRequest;
+import k.ketchapp.proto.UpdateAchievementRequest;
 import k.ketchapp.service.achievementservice.dao.AchievementDao;
 
 public class AchievementService extends AchievementServiceGrpc.AchievementServiceImplBase {
@@ -52,10 +52,12 @@ public class AchievementService extends AchievementServiceGrpc.AchievementServic
   }
 
   @Override
-  public void updateAchievements(UpdateAchievementsRequest request, StreamObserver<Empty> responseObserver) {
+  public void updateAchievements(UpdateAchievementRequest request, StreamObserver<Empty> responseObserver) {
     Event event = request.getEvent();
 
     logger.info("updating Achievements with event = " + event);
+
+    achievementDao.updateAchievement(event);
 
     responseObserver.onNext(Empty.newBuilder().build());
     responseObserver.onCompleted();

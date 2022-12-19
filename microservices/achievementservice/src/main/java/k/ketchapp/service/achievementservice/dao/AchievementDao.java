@@ -3,6 +3,7 @@ package k.ketchapp.service.achievementservice.dao;
 import java.util.List;
 import k.ketchapp.proto.Achievement;
 import k.ketchapp.proto.AchievementProgress;
+import k.ketchapp.proto.Event;
 
 public class AchievementDao {
 
@@ -44,6 +45,10 @@ public class AchievementDao {
 
       default -> null;
     };
+  }
+
+  public void updateAchievement(Event event) {
+    // TODO: implement something
   }
 
 }
