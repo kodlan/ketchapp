@@ -14,12 +14,14 @@ import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.StreamObserver;
 import io.grpc.testing.GrpcCleanupRule;
+import k.ketchapp.proto.AchievementServiceGrpc;
 import k.ketchapp.proto.Event;
 import k.ketchapp.proto.EventServiceGrpc;
 import k.ketchapp.proto.ProcessEventRequest;
 import k.ketchapp.proto.RecordServiceGrpc;
 import k.ketchapp.proto.StatsServiceGrpc;
 import k.ketchapp.proto.StoreEventRequest;
+import k.ketchapp.proto.UpdateAchievementRequest;
 import k.ketchapp.proto.UpdateStatsRequest;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,6 +53,8 @@ public class EventServiceDeadlineExceededTest {
               // register original channels for cleanup
               grpcCleanupRule.register(this.recordServiceChannel);
               grpcCleanupRule.register(this.statsServiceChannel);
+              grpcCleanupRule.register(this.achievementServiceChannel);
+
 
               // create new channels for testing
               this.recordServiceChannel = grpcCleanupRule.register(InProcessChannelBuilder
@@ -58,6 +62,10 @@ public class EventServiceDeadlineExceededTest {
                   .directExecutor()
                   .build());
               this.statsServiceChannel = grpcCleanupRule.register(InProcessChannelBuilder
+                  .forName(serverName)
+                  .directExecutor()
+                  .build());
+              this.achievementServiceChannel = grpcCleanupRule.register(InProcessChannelBuilder
                   .forName(serverName)
                   .directExecutor()
                   .build());
@@ -117,7 +125,38 @@ public class EventServiceDeadlineExceededTest {
     return shouldStatsServiceError;
   }
 
-  private ProcessEventRequest processEventRequest = ProcessEventRequest.newBuilder()
+
+
+
+  /**
+   * AchievementService mock. Override updateAchievements, return emtpy response and close the communication.
+   * This is required to unblock gRPC communication process, otherwise it will hang waiting for response.
+   */
+  private final AchievementServiceGrpc.AchievementServiceImplBase mockAchievementService =
+      mock(AchievementServiceGrpc.AchievementServiceImplBase.class, delegatesTo(
+          new AchievementServiceGrpc.AchievementServiceImplBase() {
+
+            @Override
+            public void updateAchievements(UpdateAchievementRequest request, StreamObserver<Empty> responseObserver) {
+              if (getShouldAchievementServiceError()) {
+                responseObserver.onError(Status.DEADLINE_EXCEEDED.asRuntimeException());
+              } else {
+                responseObserver.onNext(Empty.newBuilder().build());
+                responseObserver.onCompleted();
+              }
+            }
+          }
+      ));
+
+  private boolean shouldAchievementServiceError = false;
+
+  private boolean getShouldAchievementServiceError() {
+    return shouldAchievementServiceError;
+  }
+
+
+
+  private final ProcessEventRequest processEventRequest = ProcessEventRequest.newBuilder()
       .setEvent(Event.newBuilder().build())
       .build();
 
@@ -129,6 +168,7 @@ public class EventServiceDeadlineExceededTest {
         .addService(mockEventService)
         .addService(mockRecordService)
         .addService(mockStatsService)
+        .addService(mockAchievementService)
         .build()
         .start());
 
@@ -144,6 +184,7 @@ public class EventServiceDeadlineExceededTest {
 
     shouldRecordServiceError = true; // Store service fails with deadline exceeded
     shouldStatsServiceError = false; // Stats service will not fail
+    shouldAchievementServiceError = false; // Achievement service will not fail
 
     // Call processEvent. This will call RecordService and StatsService.
     Empty empty = blockingStub.processEvent(processEventRequest);
@@ -156,6 +197,8 @@ public class EventServiceDeadlineExceededTest {
     verify(mockRecordService).storeEvent(ArgumentMatchers.any(), ArgumentMatchers.any());
     // stats service should not get called as record service failed with deadline exceeded
     verify(mockStatsService, never()).updateStats(ArgumentMatchers.any(), ArgumentMatchers.any());
+    // achievement service should not get called as record service failed with deadline exceeded
+    verify(mockAchievementService, never()).updateAchievements(ArgumentMatchers.any(), ArgumentMatchers.any());
   }
 
   @Test(expected = StatusRuntimeException.class)
@@ -164,6 +207,7 @@ public class EventServiceDeadlineExceededTest {
 
     shouldRecordServiceError = false;
     shouldStatsServiceError = true;
+    shouldAchievementServiceError = false;
 
     // Call processEvent. This will call RecordService and StatsService.
     Empty empty = blockingStub.processEvent(processEventRequest);
@@ -176,14 +220,18 @@ public class EventServiceDeadlineExceededTest {
     verify(mockRecordService).storeEvent(ArgumentMatchers.any(), ArgumentMatchers.any());
     // stats service was called, but it will fail with deadline exceeded
     verify(mockStatsService).updateStats(ArgumentMatchers.any(), ArgumentMatchers.any());
+    // achievement service should not get called as record service failed with deadline exceeded
+    verify(mockAchievementService, never()).updateAchievements(ArgumentMatchers.any(), ArgumentMatchers.any());
   }
 
-  @Test
-  public void deadlineExceededForNoServiceTest() {
+
+  @Test(expected = StatusRuntimeException.class)
+  public void deadlineExceededForAchievementServiceTest() {
     EventServiceGrpc.EventServiceBlockingStub blockingStub = EventServiceGrpc.newBlockingStub(channel);
 
     shouldRecordServiceError = false;
     shouldStatsServiceError = false;
+    shouldAchievementServiceError = true;
 
     // Call processEvent. This will call RecordService and StatsService.
     Empty empty = blockingStub.processEvent(processEventRequest);
@@ -196,5 +244,31 @@ public class EventServiceDeadlineExceededTest {
     verify(mockRecordService).storeEvent(ArgumentMatchers.any(), ArgumentMatchers.any());
     // stats service was called
     verify(mockStatsService).updateStats(ArgumentMatchers.any(), ArgumentMatchers.any());
+    // achievement service was called but it will fail with deadline exceeded
+    verify(mockAchievementService).updateAchievements(ArgumentMatchers.any(), ArgumentMatchers.any());
+  }
+
+
+  @Test
+  public void deadlineExceededForNoServiceTest() {
+    EventServiceGrpc.EventServiceBlockingStub blockingStub = EventServiceGrpc.newBlockingStub(channel);
+
+    shouldRecordServiceError = false;
+    shouldStatsServiceError = false;
+    shouldAchievementServiceError = false;
+
+    // Call processEvent. This will call RecordService and StatsService.
+    Empty empty = blockingStub.processEvent(processEventRequest);
+
+    assertNotNull(empty);
+
+    // events service was called
+    verify(mockEventService).processEvent(ArgumentMatchers.any(), ArgumentMatchers.any());
+    // record service was called
+    verify(mockRecordService).storeEvent(ArgumentMatchers.any(), ArgumentMatchers.any());
+    // stats service was called
+    verify(mockStatsService).updateStats(ArgumentMatchers.any(), ArgumentMatchers.any());
+    // achievement service was called
+    verify(mockAchievementService).updateAchievements(ArgumentMatchers.any(), ArgumentMatchers.any());
   }
 }

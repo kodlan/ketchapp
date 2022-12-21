@@ -8,6 +8,8 @@ import io.grpc.stub.StreamObserver;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import k.ketchapp.proto.AchievementServiceGrpc;
+import k.ketchapp.proto.AchievementServiceGrpc.AchievementServiceBlockingStub;
 import k.ketchapp.proto.Event;
 import k.ketchapp.proto.EventServiceGrpc;
 import k.ketchapp.proto.ProcessEventRequest;
@@ -16,6 +18,7 @@ import k.ketchapp.proto.RecordServiceGrpc.RecordServiceBlockingStub;
 import k.ketchapp.proto.StatsServiceGrpc;
 import k.ketchapp.proto.StatsServiceGrpc.StatsServiceBlockingStub;
 import k.ketchapp.proto.StoreEventRequest;
+import k.ketchapp.proto.UpdateAchievementRequest;
 import k.ketchapp.proto.UpdateStatsRequest;
 
 public class EventService extends EventServiceGrpc.EventServiceImplBase {
@@ -31,6 +34,11 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
 
   ManagedChannel statsServiceChannel = ManagedChannelBuilder
       .forAddress("localhost", 50008)
+      .usePlaintext()
+      .build();
+
+  ManagedChannel achievementServiceChannel = ManagedChannelBuilder
+      .forAddress("localhost", 50009)
       .usePlaintext()
       .build();
 
@@ -59,6 +67,17 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
         ),
         responseObserver::onError,
         (exception) -> logger.info("Unspecified error from callStatsService(): " + exception)
+
+    ).andThenCall(
+
+        () -> callAchievementService(event),
+
+        Map.of(
+            Code.DEADLINE_EXCEEDED, () -> logger.info("callAchievementService() call failed with DEADLINE_EXCEEDED"),
+            Code.ABORTED, () -> logger.info("callAchievementService() call failed with ABORTED")
+        ),
+        responseObserver::onError,
+        (exception) -> logger.info("Unspecified error from callAchievementService(): " + exception)
 
     );
 
@@ -92,5 +111,19 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
     statsServiceBlockingStub
         .withDeadlineAfter(DEADLINE_MS, TimeUnit.MILLISECONDS)
         .updateStats(updateStatsRequest);
+  }
+
+  private void callAchievementService(Event event) {
+    logger.info("Calling AchievementService with event: " + event);
+    AchievementServiceBlockingStub achievementServiceBlockingStub = AchievementServiceGrpc.newBlockingStub(achievementServiceChannel);
+
+    UpdateAchievementRequest updateAchievementRequest = UpdateAchievementRequest.newBuilder()
+        .setEvent(event)
+        .build();
+
+    //noinspection ResultOfMethodCallIgnored
+    achievementServiceBlockingStub
+        .withDeadlineAfter(DEADLINE_MS, TimeUnit.MILLISECONDS)
+        .updateAchievements(updateAchievementRequest);
   }
 }

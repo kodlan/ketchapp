@@ -17,12 +17,14 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Random;
+import k.ketchapp.proto.AchievementServiceGrpc;
 import k.ketchapp.proto.Event;
 import k.ketchapp.proto.EventServiceGrpc;
 import k.ketchapp.proto.ProcessEventRequest;
 import k.ketchapp.proto.RecordServiceGrpc;
 import k.ketchapp.proto.StatsServiceGrpc;
 import k.ketchapp.proto.StoreEventRequest;
+import k.ketchapp.proto.UpdateAchievementRequest;
 import k.ketchapp.proto.UpdateStatsRequest;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,6 +57,7 @@ public class EventServiceTest {
               // register original channels for cleanup
               grpcCleanupRule.register(this.recordServiceChannel);
               grpcCleanupRule.register(this.statsServiceChannel);
+              grpcCleanupRule.register(this.achievementServiceChannel);
 
               // create new channels for testing
               this.recordServiceChannel = grpcCleanupRule.register(InProcessChannelBuilder
@@ -62,6 +65,10 @@ public class EventServiceTest {
                   .directExecutor()
                   .build());
               this.statsServiceChannel = grpcCleanupRule.register(InProcessChannelBuilder
+                  .forName(serverName)
+                  .directExecutor()
+                  .build());
+              this.achievementServiceChannel = grpcCleanupRule.register(InProcessChannelBuilder
                   .forName(serverName)
                   .directExecutor()
                   .build());
@@ -101,6 +108,21 @@ public class EventServiceTest {
           }
       ));
 
+  /**
+   * AchievementService mock. Override update, return emtpy response and close the communication.
+   * This is required to unblock gRPC communication process, otherwise it will hang waiting for response.
+   */
+  private final AchievementServiceGrpc.AchievementServiceImplBase mockAchievementService =
+      mock(AchievementServiceGrpc.AchievementServiceImplBase.class, delegatesTo(
+          new AchievementServiceGrpc.AchievementServiceImplBase() {
+
+            @Override
+            public void updateAchievements(UpdateAchievementRequest request, StreamObserver<Empty> responseObserver) {
+              responseObserver.onNext(Empty.newBuilder().build());
+              responseObserver.onCompleted();
+            }
+          }
+      ));
 
   @Before
   public void setUp() throws Exception {
@@ -110,6 +132,7 @@ public class EventServiceTest {
         .addService(mockEventService)
         .addService(mockRecordService)
         .addService(mockStatsService)
+        .addService(mockAchievementService)
         .build()
         .start());
 
@@ -143,6 +166,11 @@ public class EventServiceTest {
     ArgumentCaptor<UpdateStatsRequest> updateStatsRequestArgumentCaptor = ArgumentCaptor.forClass(UpdateStatsRequest.class);
     verify(mockStatsService).updateStats(updateStatsRequestArgumentCaptor.capture(), ArgumentMatchers.any());
     assertEquals(event, updateStatsRequestArgumentCaptor.getValue().getEvent());
+
+    // verify that AchievementService was called with correct event value
+    ArgumentCaptor<UpdateAchievementRequest> updateAchievementRequestArgumentCaptor = ArgumentCaptor.forClass(UpdateAchievementRequest.class);
+    verify(mockAchievementService).updateAchievements(updateAchievementRequestArgumentCaptor.capture(), ArgumentMatchers.any());
+    assertEquals(event, updateAchievementRequestArgumentCaptor.getValue().getEvent());
   }
 
   private static Event generateRandomEvent() {
