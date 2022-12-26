@@ -1,7 +1,13 @@
 # ketchapp
 Pet project for yet another pomodoro app :) - cloud-first microservices demo application.
 
-<b>Technologies used:</b> 
+## Prerequisites
+- Docker
+- kubectl
+- Java JDK
+- Maven
+
+## Technologies used: 
 * Java
 * gRPC
   * [Unit tests](https://github.com/kodlan/ketchapp/tree/master/microservices/eventservice/src/test/java/k/ketchapp/service/eventservice)
