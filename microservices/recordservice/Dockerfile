@@ -9,5 +9,6 @@ COPY --from=ketchapp/app \
   $BUILDER_HOME/microservices/recordservice/target/recordservice-1.0-SNAPSHOT-jar-with-dependencies.jar \
   $HOME/recordservice.jar
 
+ENV PORT=50006
 EXPOSE 50006
 ENTRYPOINT java -jar $HOME/recordservice.jar

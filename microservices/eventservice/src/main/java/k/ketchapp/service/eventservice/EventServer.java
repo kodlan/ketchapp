@@ -13,7 +13,7 @@ public class EventServer extends AbstractServer {
 
   @Override
   protected int getPort() {
-    return 50007;
+    return Integer.parseInt(System.getenv().getOrDefault("PORT", "50007"));
   }
 
   @Override

@@ -9,5 +9,6 @@ COPY --from=ketchapp/app \
   $BUILDER_HOME/microservices/achievementservice/target/achievementservice-1.0-SNAPSHOT-jar-with-dependencies.jar \
   $HOME/achievementservice.jar
 
+ENV PORT=50009
 EXPOSE 50009
 ENTRYPOINT java -jar $HOME/achievementservice.jar

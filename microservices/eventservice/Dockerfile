@@ -9,5 +9,6 @@ COPY --from=ketchapp/app \
   $BUILDER_HOME/microservices/eventservice/target/eventservice-1.0-SNAPSHOT-jar-with-dependencies.jar \
   $HOME/eventservice.jar
 
+ENV PORT=50007
 EXPOSE 50007
 ENTRYPOINT java -jar $HOME/eventservice.jar

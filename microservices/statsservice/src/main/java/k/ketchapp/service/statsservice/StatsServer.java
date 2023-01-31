@@ -14,7 +14,7 @@ public class StatsServer extends AbstractServer {
 
   @Override
   protected int getPort() {
-    return 50008;
+    return Integer.parseInt(System.getenv().getOrDefault("PORT", "50008"));
   }
 
   @Override
