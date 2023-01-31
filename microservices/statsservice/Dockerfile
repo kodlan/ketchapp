@@ -9,5 +9,6 @@ COPY --from=ketchapp/app \
   $BUILDER_HOME/microservices/statsservice/target/statsservice-1.0-SNAPSHOT-jar-with-dependencies.jar \
   $HOME/statsservice.jar
 
+ENV PORT=50008
 EXPOSE 50008
 ENTRYPOINT java -jar $HOME/statsservice.jar

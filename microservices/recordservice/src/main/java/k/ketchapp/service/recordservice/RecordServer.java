@@ -14,7 +14,7 @@ public class RecordServer extends AbstractServer {
 
   @Override
   protected int getPort() {
-    return 50006;
+    return Integer.parseInt(System.getenv().getOrDefault("PORT", "50006"));
   }
 
   @Override

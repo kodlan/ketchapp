@@ -14,7 +14,7 @@ public class AchievementServer extends AbstractServer {
 
   @Override
   protected int getPort() {
-    return 50009;
+    return Integer.parseInt(System.getenv().getOrDefault("PORT", "50009"));
   }
 
   @Override
