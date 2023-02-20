@@ -1,62 +1,62 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: recorddeployment
+  name: statsdeployment
   labels:
     app: ketchapp
-    service: record
+    service: stats
 
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: ketchapp
-      service: record
+      service: stats
 
   template:
     metadata:
       labels:
         app: ketchapp
-        service: record
+        service: stats
     spec:
       containers:
-        - image: ketchapp/recordservice:latest
-          name: recordservice
+        - image: ketchapp/statsservice:latest
+          name: statsservice
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 50006
+            - containerPort: 50008
           env:
             - name: "PORT"
-              value: "50006"
+              value: "50008"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: recordservice
+  name: statsservice
 spec:
   type: ClusterIP
   selector:
     app: ketchapp
-    service: record
+    service: stats
   ports:
     - name: grpc
-      port: 50006
-      targetPort: 50006
+      port: 50008
+      targetPort: 50008
 
 ---
 # remove this after testing
 apiVersion: v1
 kind: Service
 metadata:
-  name: record-test-node-port
+  name: stats-test-node-port
 spec:
   type: NodePort
   selector:
     app: ketchapp
-    service: record
+    service: stats
   ports:
     - name: grpc
-      port: 50006
-      targetPort: 50006
-      nodePort: 30006
+      port: 50008
+      targetPort: 50008
+      nodePort: 30008
